@@ -10,6 +10,9 @@
 #include <string.h>
 
 int main(void) {
+    if (pledge("stdio rpath cpath "
+    "wpath flock proc fattr", NULL) == -1)
+        err(EXIT_FAILURE, "pledge");
     struct sqlbox *p;
     struct sqlbox_cfg cfg;
     size_t id;
@@ -24,6 +27,8 @@ int main(void) {
     cfg.srcs.srcsz = 1;
     if ((p = sqlbox_alloc(&cfg)) == NULL)
         errx(EXIT_FAILURE, "sqlbox_alloc");
+    if (pledge("stdio", NULL) == -1)
+        err(EXIT_FAILURE, "pledge");
     if (!(id = sqlbox_open(p, 0)))
         errx(EXIT_FAILURE, "sqlbox_open");
     struct kreq r;
