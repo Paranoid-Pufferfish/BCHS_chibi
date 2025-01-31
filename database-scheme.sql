@@ -1,12 +1,9 @@
 /* Title: Database example schema */
 
-CREATE TABLE BCHS
+CREATE TABLE hits
 (
-    ID INTEGER PRIMARY KEY AUTOINCREMENT,
-    NUM INTEGER NOT NULL,
-    STR TEXT    NOT NULL
+    hits INTEGER NOT NULL
 );
 
-INSERT INTO BCHS(NUM, STR)
-VALUES (5, 'foo'),
-       (7, 'bar');
+INSERT INTO hits (hits)
+VALUES (0);
