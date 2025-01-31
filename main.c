@@ -11,6 +11,7 @@
 
 
 int main(void) {
+
     if (pledge("stdio rpath cpath "
                "wpath flock proc fattr", NULL) == -1)
         err(EXIT_FAILURE, "pledge");
