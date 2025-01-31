@@ -36,9 +36,12 @@ int main(void) {
         errx(EXIT_FAILURE, "sqlbox_open");
     struct kreq r;
     struct khtmlreq req;
+    if (pledge("stdio proc", NULL) == -1)
+        err(EXIT_FAILURE, "pledge");
     if (khttp_parse(&r, 0, 0, 0, 0, 0) != KCGI_OK)
         return 1;
-
+    if (pledge("stdio", NULL) == -1)
+        err(EXIT_FAILURE, "pledge");
     khttp_head(&r, kresps[KRESP_STATUS],
                "%s", khttps[KHTTP_200]);
     khttp_head(&r, kresps[KRESP_CONTENT_TYPE],
