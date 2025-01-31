@@ -12,6 +12,7 @@
 int main(void) {
     struct sqlbox *p;
     struct sqlbox_cfg cfg;
+    size_t id;
     struct sqlbox_src srcs[] = {
         {
             .fname = (char *)"db.db",
@@ -23,6 +24,8 @@ int main(void) {
     cfg.srcs.srcsz = 1;
     if ((p = sqlbox_alloc(&cfg)) == NULL)
         errx(EXIT_FAILURE, "sqlbox_alloc");
+    if (!(id = sqlbox_open(p, 0)))
+        errx(EXIT_FAILURE, "sqlbox_open");
     struct kreq r;
     struct khtmlreq req;
     if (khttp_parse(&r, 0, 0, 0, 0, 0) != KCGI_OK)
