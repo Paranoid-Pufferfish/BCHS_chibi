@@ -2,6 +2,7 @@
 #include <stdarg.h> /* va_list */
 #include <stdint.h> /* int64_t */
 #include <stdio.h> /* sprintf */
+#include <unistd.h>
 #include <err.h>
 #include <kcgi.h>
 #include <kcgihtml.h>
