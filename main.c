@@ -2,10 +2,27 @@
 #include <stdarg.h> /* va_list */
 #include <stdint.h> /* int64_t */
 #include <stdio.h> /* sprintf */
+#include <err.h>
 #include <kcgi.h>
 #include <kcgihtml.h>
+#include <sqlbox.h>
+#include <stdlib.h>
+#include <string.h>
 
 int main(void) {
+    struct sqlbox *p;
+    struct sqlbox_cfg cfg;
+    struct sqlbox_src srcs[] = {
+        {
+            .fname = (char *)"db.db",
+            .mode = SQLBOX_SRC_RWC
+        }};
+    memset(&cfg,0,sizeof(struct sqlbox_cfg));
+    cfg.msg.func_short = warnx;
+    cfg.srcs.srcs = srcs;
+    cfg.srcs.srcsz = 1;
+    if ((p = sqlbox_alloc(&cfg)) == NULL)
+        errx(EXIT_FAILURE, "sqlbox_alloc");
     struct kreq r;
     struct khtmlreq req;
     if (khttp_parse(&r, 0, 0, 0, 0, 0) != KCGI_OK)
@@ -41,5 +58,6 @@ int main(void) {
     }
     khtml_close(&req);
     khttp_free(&r);
+    sqlbox_free(p);
     return 0;
 }
