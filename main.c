@@ -59,8 +59,8 @@ int main(void) {
     if (!(stmtid = sqlbox_prepare_bind(p,id,0,2,parms,0)))
         errx(EXIT_FAILURE, "sqlbox_prepare_bind");
 
-    if ((res = sqlbox_step(p,stmtid)) == NULL)
-        errx(EXIT_FAILURE, "sqlbox_step");
+    // if ((res = sqlbox_step(p,stmtid)) == NULL)
+    //     errx(EXIT_FAILURE, "sqlbox_step");
     if (!(sqlbox_finalise(p,stmtid)))
         errx(EXIT_FAILURE, "sqlbox_finalise");
     sqlbox_free(p);
