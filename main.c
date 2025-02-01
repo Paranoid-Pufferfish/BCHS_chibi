@@ -20,7 +20,7 @@ int main(void) {
     struct sqlbox_src srcs[] = {
         {
             .fname = (char *) "db.db",
-            .mode = SQLBOX_SRC_RWC
+            .mode = SQLBOX_SRC_RW
         }
     };
     struct sqlbox_pstmt stmts[] = {
@@ -52,12 +52,13 @@ int main(void) {
     cfg.stmts.stmtsz = 1;
     if ((p = sqlbox_alloc(&cfg)) == NULL)
         errx(EXIT_FAILURE, "sqlbox_alloc");
-    if (pledge("stdio proc", NULL) == -1)
-        err(EXIT_FAILURE, "pledge");
+    // if (pledge("stdio proc", NULL) == -1)
+    //     err(EXIT_FAILURE, "pledge");
     if (!(id = sqlbox_open(p, 0)))
         errx(EXIT_FAILURE, "sqlbox_open");
     if (!(stmtid = sqlbox_prepare_bind(p,id,0,2,parms,0)))
         errx(EXIT_FAILURE, "sqlbox_prepare_bind");
+
     if ((res = sqlbox_step(p,stmtid)) == NULL)
         errx(EXIT_FAILURE, "sqlbox_step");
     if (!(sqlbox_finalise(p,stmtid)))
