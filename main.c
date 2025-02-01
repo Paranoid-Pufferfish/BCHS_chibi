@@ -16,7 +16,6 @@ int main(void) {
     struct sqlbox *p;
     struct sqlbox_cfg cfg;
     size_t id,stmtid;
-    const struct sqlbox_parmset *res;
     struct sqlbox_src srcs[] = {
         {
             .fname = (char *) "db.db",
@@ -59,8 +58,7 @@ int main(void) {
     if (!(stmtid = sqlbox_prepare_bind(p,id,0,2,parms,0)))
         errx(EXIT_FAILURE, "sqlbox_prepare_bind");
 
-    // if ((res = sqlbox_step(p,stmtid)) == NULL)
-    //     errx(EXIT_FAILURE, "sqlbox_step");
+   const struct sqlbox_parmset *res = sqlbox_step(p, stmtid);
     if (!(sqlbox_finalise(p,stmtid)))
         errx(EXIT_FAILURE, "sqlbox_finalise");
     sqlbox_free(p);
