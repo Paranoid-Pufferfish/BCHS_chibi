@@ -15,11 +15,27 @@ int main(void) {
     struct khtmlreq req;
     struct sqlbox *p;
     struct sqlbox_cfg cfg;
-    size_t id;
+    size_t id,stmtid;
     struct sqlbox_src srcs[] = {
         {
             .fname = (char *) "db.db",
             .mode = SQLBOX_SRC_RWC
+        }
+    };
+    struct sqlbox_pstmt stmts[] = {
+        {
+            .stmt = (char *) "INSERT INTO BCHS(NUM, STR) VALUES (?,?)"
+        }
+    };
+    struct sqlbox_parm parms[] = {
+        {
+            .iparm = 99,
+            .type = SQLBOX_PARM_INT
+        },
+        {
+            .sparm = "It worked Fuckers!!!\0",
+            .type = SQLBOX_PARM_STRING
+
         }
     };
     if (pledge("stdio rpath cpath "
@@ -30,12 +46,16 @@ int main(void) {
     cfg.msg.func_short = warnx;
     cfg.srcs.srcs = srcs;
     cfg.srcs.srcsz = 1;
+    cfg.stmts.stmts = stmts;
+    cfg.stmts.stmtsz = 1;
     if ((p = sqlbox_alloc(&cfg)) == NULL)
         errx(EXIT_FAILURE, "sqlbox_alloc");
     if (pledge("stdio proc", NULL) == -1)
         err(EXIT_FAILURE, "pledge");
     if (!(id = sqlbox_open(p, 0)))
         errx(EXIT_FAILURE, "sqlbox_open");
+    if (!(stmtid = sqlbox_prepare_bind(p,id,0,2,parms,0)))
+        errx(EXIT_FAILURE, "sqlbox_prepare_bind");
     if (khttp_parse(&r, 0, 0, 0, 0, 0) != KCGI_OK)
         return 1;
     if (pledge("stdio", NULL) == -1)
