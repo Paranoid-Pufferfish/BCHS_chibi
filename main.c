@@ -40,9 +40,9 @@ int main(void) {
 
         }
     };
-    if (pledge("stdio rpath cpath "
-               "wpath flock proc fattr", NULL) == -1)
-        err(EXIT_FAILURE, "pledge");
+    // if (pledge("stdio rpath cpath "
+    //            "wpath flock proc fattr", NULL) == -1)
+    //     err(EXIT_FAILURE, "pledge");
 
     memset(&cfg, 0, sizeof(struct sqlbox_cfg));
     cfg.msg.func_short = warnx;
@@ -63,10 +63,11 @@ int main(void) {
         errx(EXIT_FAILURE, "sqlbox_step");
     if (!(sqlbox_finalise(p,stmtid)))
         errx(EXIT_FAILURE, "sqlbox_finalise");
+    sqlbox_free(p);
     if (khttp_parse(&r, 0, 0, 0, 0, 0) != KCGI_OK)
         return 1;
-    if (pledge("stdio", NULL) == -1)
-        err(EXIT_FAILURE, "pledge");
+    // if (pledge("stdio", NULL) == -1)
+    //     err(EXIT_FAILURE, "pledge");
     khttp_head(&r, kresps[KRESP_STATUS],
                "%s", khttps[KHTTP_200]);
     khttp_head(&r, kresps[KRESP_CONTENT_TYPE],
@@ -97,6 +98,6 @@ int main(void) {
     }
     khtml_close(&req);
     khttp_free(&r);
-    sqlbox_free(p);
+
     return 0;
 }
