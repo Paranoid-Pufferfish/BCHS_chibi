@@ -56,7 +56,7 @@ int main(void) {
     //     err(EXIT_FAILURE, "pledge");
     if (!(id = sqlbox_open(p, 0)))
         errx(EXIT_FAILURE, "sqlbox_open");
-    if (!(stmtid = sqlbox_prepare_bind(p,id,1,2,parms,0)))
+    if (!(stmtid = sqlbox_prepare_bind(p,id,0,2,parms,0)))
         errx(EXIT_FAILURE, "sqlbox_prepare_bind");
 
     // if ((res = sqlbox_step(p,stmtid)) == NULL)
