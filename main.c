@@ -15,7 +15,7 @@ int main(void) {
     struct khtmlreq req;
     struct sqlbox *p;
     struct sqlbox_cfg cfg;
-    size_t id,stmtid;
+    size_t id, stmtid;
     struct sqlbox_src srcs[] = {
         {
             .fname = (char *) "db.db",
@@ -39,9 +39,9 @@ int main(void) {
 
         }
     };
-    // if (pledge("stdio rpath cpath "
-    //            "wpath flock proc fattr", NULL) == -1)
-    //     err(EXIT_FAILURE, "pledge");
+    if (pledge("stdio rpath cpath wpath "
+               "flock proc fattr", NULL) == -1)
+        err(EXIT_FAILURE, "pledge");
 
     memset(&cfg, 0, sizeof(struct sqlbox_cfg));
     cfg.msg.func_short = warnx;
@@ -55,11 +55,11 @@ int main(void) {
     //     err(EXIT_FAILURE, "pledge");
     if (!(id = sqlbox_open(p, 0)))
         errx(EXIT_FAILURE, "sqlbox_open");
-    if (!(stmtid = sqlbox_prepare_bind(p,id,0,2,parms,0)))
+    if (!(stmtid = sqlbox_prepare_bind(p, id, 0, 2, parms, 0)))
         errx(EXIT_FAILURE, "sqlbox_prepare_bind");
 
-   const struct sqlbox_parmset *res = sqlbox_step(p, stmtid);
-    if (!(sqlbox_finalise(p,stmtid)))
+    const struct sqlbox_parmset *res = sqlbox_step(p, stmtid);
+    if (!(sqlbox_finalise(p, stmtid)))
         errx(EXIT_FAILURE, "sqlbox_finalise");
     sqlbox_free(p);
     if (khttp_parse(&r, 0, 0, 0, 0, 0) != KCGI_OK)
