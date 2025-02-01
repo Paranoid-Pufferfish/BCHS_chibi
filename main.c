@@ -16,6 +16,7 @@ int main(void) {
     struct sqlbox *p;
     struct sqlbox_cfg cfg;
     size_t id,stmtid;
+    const struct sqlbox_parmset *res;
     struct sqlbox_src srcs[] = {
         {
             .fname = (char *) "db.db",
@@ -34,7 +35,8 @@ int main(void) {
         },
         {
             .sparm = "It worked Fuckers!!!\0",
-            .type = SQLBOX_PARM_STRING
+            .type = SQLBOX_PARM_STRING,
+            .sz = 0
 
         }
     };
@@ -56,6 +58,10 @@ int main(void) {
         errx(EXIT_FAILURE, "sqlbox_open");
     if (!(stmtid = sqlbox_prepare_bind(p,id,0,2,parms,0)))
         errx(EXIT_FAILURE, "sqlbox_prepare_bind");
+    if ((res = sqlbox_step(p,stmtid)) == NULL)
+        errx(EXIT_FAILURE, "sqlbox_step");
+    if (!(sqlbox_finalise(p,stmtid)))
+        errx(EXIT_FAILURE, "sqlbox_finalise");
     if (khttp_parse(&r, 0, 0, 0, 0, 0) != KCGI_OK)
         return 1;
     if (pledge("stdio", NULL) == -1)
