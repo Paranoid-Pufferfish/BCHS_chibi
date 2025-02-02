@@ -59,7 +59,7 @@ int main(void) {
     //     errx(EXIT_FAILURE, "sqlbox_prepare_bind");
     //
     // const struct sqlbox_parmset *res = sqlbox_step(p, stmtid);
-    if (!sqlbox_exec(p,0,0,2,parms,0))
+    if (!sqlbox_exec(p,id,0,2,parms,0))
         errx(EXIT_FAILURE, "sqlbox_exec");
     /*if (!(sqlbox_finalise(p, stmtid)))
         errx(EXIT_FAILURE, "sqlbox_finalise");*/
