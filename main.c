@@ -5,8 +5,6 @@
 #include <err.h> /* err(), warnx() */
 #include <stdlib.h> /* EXIT_FAILURE */
 #include <string.h> /* memset() */
-#include <kcgi.h>
-#include <kcgihtml.h>
 #include <sqlbox.h>
 
 
