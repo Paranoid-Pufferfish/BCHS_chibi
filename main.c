@@ -38,7 +38,7 @@ int main(void) {
         errx(EXIT_FAILURE, "sqlbox_alloc");
     if (!(dbid = sqlbox_open(p, 0)))
         errx(EXIT_FAILURE, "sqlbox_open");
-    if (!(stmtid = sqlbox_prepare_bind(p, dbid, 1, 1, parms, 0)))
+    if (!(stmtid = sqlbox_prepare_bind(p, dbid, 0, 1, parms, 0)))
         errx(EXIT_FAILURE, "sqlbox_prepare_bind");
     if ((res = sqlbox_step(p, stmtid)) == NULL)
         errx(EXIT_FAILURE, "sqlbox_step");
