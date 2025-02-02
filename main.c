@@ -24,19 +24,13 @@ int main(void) {
     };
     struct sqlbox_pstmt stmts[] = {
         {
-            .stmt = (char *) "INSERT INTO BCHS(NUM, STR) VALUES (?,?)"
+            .stmt = (char *) "INSERT INTO BCHS(NUM) VALUES (?)"
         }
     };
     struct sqlbox_parm parms[] = {
         {
             .iparm = 99,
             .type = SQLBOX_PARM_INT
-        },
-        {
-            .sparm = "It worked Fuckers!!!\0",
-            .type = SQLBOX_PARM_STRING,
-            .sz = 0
-
         }
     };
     if (pledge("stdio rpath cpath wpath "
@@ -51,18 +45,14 @@ int main(void) {
     cfg.stmts.stmtsz = 1;
     if ((p = sqlbox_alloc(&cfg)) == NULL)
         errx(EXIT_FAILURE, "sqlbox_alloc");
-    // if (pledge("stdio proc", NULL) == -1)
-    //     err(EXIT_FAILURE, "pledge");
     if (!(id = sqlbox_open(p, 0)))
         errx(EXIT_FAILURE, "sqlbox_open");
-    // if (!(stmtid = sqlbox_prepare_bind(p, id, 0, 2, parms, 0)))
-    //     errx(EXIT_FAILURE, "sqlbox_prepare_bind");
-    //
-    // const struct sqlbox_parmset *res = sqlbox_step(p, stmtid);
-    if (!sqlbox_exec(p,id,0,2,parms,0))
-        errx(EXIT_FAILURE, "sqlbox_exec");
-    /*if (!(sqlbox_finalise(p, stmtid)))
-        errx(EXIT_FAILURE, "sqlbox_finalise");*/
+    if (!(stmtid = sqlbox_prepare_bind(p, id, 0, 1, parms, 0)))
+        errx(EXIT_FAILURE, "sqlbox_prepare_bind");
+
+    const struct sqlbox_parmset *res = sqlbox_step(p, stmtid);
+    if (!(sqlbox_finalise(p, stmtid)))
+        errx(EXIT_FAILURE, "sqlbox_finalise");
     sqlbox_free(p);
     if (khttp_parse(&r, 0, 0, 0, 0, 0) != KCGI_OK)
         return 1;
