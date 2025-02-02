@@ -55,12 +55,14 @@ int main(void) {
     //     err(EXIT_FAILURE, "pledge");
     if (!(id = sqlbox_open(p, 0)))
         errx(EXIT_FAILURE, "sqlbox_open");
-    if (!(stmtid = sqlbox_prepare_bind(p, id, 0, 2, parms, 0)))
-        errx(EXIT_FAILURE, "sqlbox_prepare_bind");
-
-    const struct sqlbox_parmset *res = sqlbox_step(p, stmtid);
-    if (!(sqlbox_finalise(p, stmtid)))
-        errx(EXIT_FAILURE, "sqlbox_finalise");
+    // if (!(stmtid = sqlbox_prepare_bind(p, id, 0, 2, parms, 0)))
+    //     errx(EXIT_FAILURE, "sqlbox_prepare_bind");
+    //
+    // const struct sqlbox_parmset *res = sqlbox_step(p, stmtid);
+    if (!sqlbox_exec(p,0,0,2,parms,0))
+        errx(EXIT_FAILURE, "sqlbox_exec");
+    /*if (!(sqlbox_finalise(p, stmtid)))
+        errx(EXIT_FAILURE, "sqlbox_finalise");*/
     sqlbox_free(p);
     if (khttp_parse(&r, 0, 0, 0, 0, 0) != KCGI_OK)
         return 1;
