@@ -1,6 +1,6 @@
 #! /bin/sh
-cc `pkg-config --static --cflags kcgi-html ksql` -c -o cgi.o main.c
-cc -static -o cgi cgi.o `pkg-config --static --libs kcgi-html ksql`
+cc `pkg-config --static --cflags kcgi-html sqlbox` -c -o cgi.o main.c
+cc -static -o cgi cgi.o `pkg-config --static --libs kcgi-html sqlbox`
 [ -d /var/www/cgi-bin/db ] || doas mkdir /var/www/cgi-bin/db
 doas chown www:www /var/www/cgi-bin/db
 doas chmod 0700 /var/www/cgi-bin/db
