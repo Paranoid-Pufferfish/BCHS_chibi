@@ -105,7 +105,7 @@ int main(void) {
             break;
         case PAGE_ADD:
             if ((p = r.fieldmap[KEY_VAL]))
-                khtml_printf(&req, "You are in ADD and VAL = %ld", p->parsed.i);
+                khtml_printf(&req, "You are in ADD and VAL = %lld", p->parsed.i);
             else if (r.fieldnmap[KEY_VAL])
                 khtml_printf(&req, "You are in ADD and VAL is wrong");
             else
