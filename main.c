@@ -52,7 +52,7 @@ int main(void) {
     if (!sqlbox_finalise(p, stmtid))
         errx(EXIT_FAILURE, "sqlbox_finalise");
     sqlbox_free(p);
-    if (pledge("stdio", NULL) == -1)
+    if (pledge("stdio proc", NULL) == -1)
         err(EXIT_FAILURE, "pledge");
     if (khttp_parse(&r, 0, 0, 0, 0, 0) != KCGI_OK)
         return 1;
