@@ -1,5 +1,6 @@
 #include <sys/types.h> /* size_t, ssize_t */
 #include <stdarg.h> /* va_list */
+#include <stddef.h> /* NULL */
 #include <stdint.h> /* int64_t */
 #include <unistd.h> /* pledge() */
 #include <err.h> /* err(), warnx() */
@@ -11,47 +12,49 @@
 
 
 int main(void) {
-    size_t dbid, stmtid;
-    struct sqlbox *p;
-    struct sqlbox_cfg cfg;
     struct kreq r;
     struct khtmlreq req;
-    struct sqlbox_src srcs[] = {
-        { .fname = (char *)"db/db.db",
-          .mode = SQLBOX_SRC_RWC }
-    };
-    struct sqlbox_pstmt pstmts[] = {
-        { .stmt = (char *)"INSERT INTO BCHS (NUM) VALUES (?)" },
-      };
-    struct sqlbox_parm parms[] = {
-        { .iparm = 10,
-          .type = SQLBOX_PARM_INT },
-      };
-    const struct sqlbox_parmset *res;
 
-    memset(&cfg, 0, sizeof(struct sqlbox_cfg));
-    cfg.msg.func_short = warnx;
-    cfg.srcs.srcsz = 1;
-    cfg.srcs.srcs = srcs;
-    cfg.stmts.stmtsz = 1;
-    cfg.stmts.stmts = pstmts;
+    // size_t dbid, stmtid;
+    // struct sqlbox *p;
+    // struct sqlbox_cfg cfg;
+    // struct sqlbox_src srcs[] = {
+    //     { .fname = (char *)"db/db.db",
+    //       .mode = SQLBOX_SRC_RWC }
+    // };
+    // struct sqlbox_pstmt pstmts[] = {
+    //     { .stmt = (char *)"INSERT INTO BCHS (NUM) VALUES (?)" },
+    //   };
+    // struct sqlbox_parm parms[] = {
+    //     { .iparm = 10,
+    //       .type = SQLBOX_PARM_INT },
+    //   };
+    // const struct sqlbox_parmset *res;
+    //
+    // memset(&cfg, 0, sizeof(struct sqlbox_cfg));
+    // cfg.msg.func_short = warnx;
+    // cfg.srcs.srcsz = 1;
+    // cfg.srcs.srcs = srcs;
+    // cfg.stmts.stmtsz = 1;
+    // cfg.stmts.stmts = pstmts;
+    //
+    // if (pledge("stdio rpath cpath "
+    //     "wpath flock proc fattr", NULL) == -1)
+    //     err(EXIT_FAILURE, "pledge");
+    // if ((p = sqlbox_alloc(&cfg)) == NULL)
+    //     errx(EXIT_FAILURE, "sqlbox_alloc");
+    // if (pledge("stdio proc", NULL) == -1)
+    //     err(EXIT_FAILURE, "pledge");
+    // if (!(dbid = sqlbox_open(p, 0)))
+    //     errx(EXIT_FAILURE, "sqlbox_open");
+    // if (!(stmtid = sqlbox_prepare_bind(p, dbid, 0, 1, parms, 0)))
+    //     errx(EXIT_FAILURE, "sqlbox_prepare_bind");
+    // if ((res = sqlbox_step(p, stmtid)) == NULL)
+    //     errx(EXIT_FAILURE, "sqlbox_step");
+    // if (!sqlbox_finalise(p, stmtid))
+    //     errx(EXIT_FAILURE, "sqlbox_finalise");
+    // sqlbox_free(p);
 
-    if (pledge("stdio rpath cpath "
-        "wpath flock proc fattr", NULL) == -1)
-        err(EXIT_FAILURE, "pledge");
-    if ((p = sqlbox_alloc(&cfg)) == NULL)
-        errx(EXIT_FAILURE, "sqlbox_alloc");
-    if (pledge("stdio proc", NULL) == -1)
-        err(EXIT_FAILURE, "pledge");
-    if (!(dbid = sqlbox_open(p, 0)))
-        errx(EXIT_FAILURE, "sqlbox_open");
-    if (!(stmtid = sqlbox_prepare_bind(p, dbid, 0, 1, parms, 0)))
-        errx(EXIT_FAILURE, "sqlbox_prepare_bind");
-    if ((res = sqlbox_step(p, stmtid)) == NULL)
-        errx(EXIT_FAILURE, "sqlbox_step");
-    if (!sqlbox_finalise(p, stmtid))
-        errx(EXIT_FAILURE, "sqlbox_finalise");
-    sqlbox_free(p);
     if (pledge("stdio proc", NULL) == -1)
         err(EXIT_FAILURE, "pledge");
     if (khttp_parse(&r, 0, 0, 0, 0, 0) != KCGI_OK)
