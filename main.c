@@ -97,8 +97,18 @@ int main(void) {
     khttp_body(&r);
     khtml_open(&req, &r, 0);
     kcgi_writer_disable(&r);
-    khtml_elem(&req,KELEM_H1);
-    khtml_printf(&req,"Hello World!");
+    khtml_elem(&req, KELEM_H1);
+    switch (r.page) {
+        case PAGE_INDEX: khtml_printf(&req, "You are in INDEX");
+            break;
+        case PAGE_ADD: khtml_printf(&req, "You are in ADD");
+            break;
+        case PAGE_GET: khtml_printf(&req, "You are in GET");
+            break;
+        default:
+
+    }
+    khtml_closeelem(&req, 0);
     khtml_close(&req);
     khttp_free(&r);
     return 0;
