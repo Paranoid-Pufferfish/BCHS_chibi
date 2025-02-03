@@ -38,6 +38,7 @@ const char *const pages[PAGE__MAX] = {
 
 int main(void) {
     struct kreq r;
+    struct kpair *p;
     struct khtmlreq req;
 
     // size_t dbid, stmtid;
@@ -98,10 +99,17 @@ int main(void) {
     khtml_open(&req, &r, 0);
     kcgi_writer_disable(&r);
     khtml_elem(&req, KELEM_H1);
+
     switch (r.page) {
         case PAGE_INDEX: khtml_printf(&req, "You are in INDEX");
             break;
-        case PAGE_ADD: khtml_printf(&req, "You are in ADD");
+        case PAGE_ADD:
+            if ((p = r.fieldmap[KEY_VAL]))
+                khtml_printf(&req, "You are in ADD and VAL = %ld", p->parsed.i);
+            else if (r.fieldnmap[KEY_VAL])
+                khtml_printf(&req, "You are in ADD and VAL is wrong");
+            else
+                khtml_printf(&req, "You are in ADD and VAL isnt provided");
             break;
         case PAGE_GET: khtml_printf(&req, "You are in GET");
             break;
