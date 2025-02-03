@@ -17,8 +17,8 @@ int main(void) {
     struct kreq r;
     struct khtmlreq req;
     struct sqlbox_src srcs[] = {
-        { .fname = (char *)"db.db",
-          .mode = SQLBOX_SRC_RW }
+        { .fname = (char *)"db/db.db",
+          .mode = SQLBOX_SRC_RWC }
     };
     struct sqlbox_pstmt pstmts[] = {
         { .stmt = (char *)"INSERT INTO BCHS (NUM) VALUES (?)" },
