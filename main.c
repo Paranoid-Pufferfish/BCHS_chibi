@@ -105,8 +105,8 @@ int main(void) {
             break;
         case PAGE_GET: khtml_printf(&req, "You are in GET");
             break;
-        default:
-
+        default: khtml_printf(&req, "ERROR");
+            break;
     }
     khtml_closeelem(&req, 0);
     khtml_close(&req);
