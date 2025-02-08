@@ -64,9 +64,15 @@ int main(void) {
 
     if ((res = sqlbox_step(p2, stmtid)) == NULL)
         errx(EXIT_FAILURE, "sqlbox_step");
+    khtml_elem(&req, KELEM_BR);
     khtml_printf(&req, "Size: %zu", res->psz);
     if ((res = sqlbox_step(p2, stmtid)) == NULL)
         errx(EXIT_FAILURE, "sqlbox_step");
+    khtml_elem(&req, KELEM_BR);
+    khtml_printf(&req, "Size: %zu", res->psz);
+    if ((res = sqlbox_step(p2, stmtid)) == NULL)
+        errx(EXIT_FAILURE, "sqlbox_step");
+    khtml_elem(&req, KELEM_BR);
     khtml_printf(&req, "Size: %zu", res->psz);
     // for (int i = 0; i < res->psz; ++i) {
     //     switch (res->ps[i].type) {
