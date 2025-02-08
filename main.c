@@ -50,9 +50,7 @@ int main(void) {
     if ((res = sqlbox_step(p2, stmtid)) == NULL)
         errx(EXIT_FAILURE, "sqlbox_step");
     if ((res = sqlbox_step(p2, stmtid)) == NULL)
-        errx(EXIT_FAILURE, "sqlbox_step");
-    if ((res = sqlbox_step(p2, stmtid)) == NULL)
-        errx(EXIT_FAILURE, "sqlbox_step");
+        errx(EXIT_FAILURE, "Third sqlbox_step");
 
     enum khttp er = KHTTP_200;
     if (khttp_parse(&r, 0, 0, 0, 0, 0) != KCGI_OK)
