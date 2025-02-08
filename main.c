@@ -53,7 +53,7 @@ int main(void) {
     enum khttp er = KHTTP_200;
     if (pledge("stdio proc", NULL) == -1)
         err(EXIT_FAILURE, "pledge");
-    if (khttp_parse(&r, 0,0,0,0,0) != KCGI_OK)
+    if (khttp_parse(&r, 0, 0, 0, 0, 0) != KCGI_OK)
         return 1;
     if (pledge("stdio", NULL) == -1)
         err(EXIT_FAILURE, "pledge");
@@ -66,35 +66,37 @@ int main(void) {
     khttp_body(&r);
     khtml_open(&req, &r, 0);
     kcgi_writer_disable(&r);
+    if (pledge("stdio proc", NULL) == -1)
+        err(EXIT_FAILURE, "pledge");
     for (int i = 0; i < res->psz; ++i) {
         switch (res->ps[i].type) {
             case SQLBOX_PARM_BLOB:
                 khtml_printf(&req, "Blob: %zu bytes\n", res->ps[i].sz);
-            khtml_elem(&req, KELEM_BR);
-            break;
+                khtml_elem(&req, KELEM_BR);
+                break;
             case SQLBOX_PARM_FLOAT:
                 khtml_printf(&req, "Float: %f\n", res->ps[i].fparm);
-            khtml_elem(&req, KELEM_BR);
-            break;
+                khtml_elem(&req, KELEM_BR);
+                break;
             case SQLBOX_PARM_INT:
                 khtml_printf(&req, "Blob: %lld\n", res->ps[i].iparm);
-            khtml_elem(&req, KELEM_BR);
-            break;
+                khtml_elem(&req, KELEM_BR);
+                break;
             case SQLBOX_PARM_NULL:
                 khtml_printf(&req, "Null\n");
-            khtml_elem(&req, KELEM_BR);
-            break;
+                khtml_elem(&req, KELEM_BR);
+                break;
             case SQLBOX_PARM_STRING:
                 khtml_printf(&req, "String: %s\n", res->ps[i].sparm);
-            khtml_elem(&req, KELEM_BR);
-            break;
+                khtml_elem(&req, KELEM_BR);
+                break;
         }
     }
 
-        if (!sqlbox_finalise(p2, stmtid))
-            errx(EXIT_FAILURE, "sqlbox_finalise");
-        sqlbox_free(p2);
-        khtml_close(&req);
-        khttp_free(&r);
-        return 0;
-    }
+    if (!sqlbox_finalise(p2, stmtid))
+        errx(EXIT_FAILURE, "sqlbox_finalise");
+    sqlbox_free(p2);
+    khtml_close(&req);
+    khttp_free(&r);
+    return 0;
+}
