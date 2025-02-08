@@ -42,25 +42,6 @@ int main(void) {
     struct kreq r;
     struct kpair *p;
     struct khtmlreq req;
-    enum khttp er = KHTTP_200;
-    if (pledge("stdio proc", NULL) == -1)
-        err(EXIT_FAILURE, "pledge");
-    if (khttp_parse(&r, keys, KEY__MAX, pages, PAGE__MAX, PAGE_INDEX) != KCGI_OK)
-        return 1;
-    if (pledge("stdio", NULL) == -1)
-        err(EXIT_FAILURE, "pledge");
-    if (r.mime != KMIME_TEXT_HTML)
-        er = KHTTP_404;
-    if (r.method != KMETHOD_GET)
-        er = KHTTP_405;
-    khttp_head(&r, kresps[KRESP_STATUS],
-               "%s", khttps[er]);
-    khttp_head(&r, kresps[KRESP_CONTENT_TYPE],
-               "%s", kmimetypes[KMIME_TEXT_HTML]);
-    khttp_body(&r);
-    khtml_open(&req, &r, 0);
-    kcgi_writer_disable(&r);
-
     size_t dbid, stmtid;
     struct sqlbox *p2;
     struct sqlbox_cfg cfg;
@@ -93,6 +74,24 @@ int main(void) {
         errx(EXIT_FAILURE, "sqlbox_open");
     if (!(stmtid = sqlbox_prepare_bind(p2, dbid, 0, 0, 0, 0)))
         errx(EXIT_FAILURE, "sqlbox_prepare_bind");
+    enum khttp er = KHTTP_200;
+    if (pledge("stdio proc", NULL) == -1)
+        err(EXIT_FAILURE, "pledge");
+    if (khttp_parse(&r, keys, KEY__MAX, pages, PAGE__MAX, PAGE_INDEX) != KCGI_OK)
+        return 1;
+    if (pledge("stdio", NULL) == -1)
+        err(EXIT_FAILURE, "pledge");
+    if (r.mime != KMIME_TEXT_HTML)
+        er = KHTTP_404;
+    if (r.method != KMETHOD_GET)
+        er = KHTTP_405;
+    khttp_head(&r, kresps[KRESP_STATUS],
+               "%s", khttps[er]);
+    khttp_head(&r, kresps[KRESP_CONTENT_TYPE],
+               "%s", kmimetypes[KMIME_TEXT_HTML]);
+    khttp_body(&r);
+    khtml_open(&req, &r, 0);
+    kcgi_writer_disable(&r);
      while ((res = sqlbox_step(p2, stmtid)) != NULL) {
          switch (r.page) {
              case PAGE_INDEX: khtml_printf(&req, "You are in INDEX");
