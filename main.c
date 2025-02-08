@@ -49,7 +49,9 @@ int main(void) {
         errx(EXIT_FAILURE, "sqlbox_prepare_bind");
     if ((res = sqlbox_step(p2, stmtid)) == NULL)
         errx(EXIT_FAILURE, "sqlbox_step");
- if ((res = sqlbox_step(p2, stmtid)) == NULL)
+    if ((res = sqlbox_step(p2, stmtid)) == NULL)
+        errx(EXIT_FAILURE, "sqlbox_step");
+    if ((res = sqlbox_step(p2, stmtid)) == NULL)
         errx(EXIT_FAILURE, "sqlbox_step");
 
     enum khttp er = KHTTP_200;
