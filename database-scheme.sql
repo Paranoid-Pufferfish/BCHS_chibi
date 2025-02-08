@@ -7,3 +7,6 @@ CREATE TABLE chibis
     HIT INTEGER,
     PING BOOLEAN
 );
+
+INSERT INTO chibis VALUES ('FOO',55,0,TRUE),
+                          ('BAR',99,5,FALSE)
