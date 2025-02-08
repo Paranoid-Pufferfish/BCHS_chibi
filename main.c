@@ -51,7 +51,7 @@ int main(void) {
           .mode = SQLBOX_SRC_RWC }
     };
     struct sqlbox_pstmt pstmts[] = {
-        { .stmt = (char *)"SELECT (CCID,CCINDEX) FROM chibis"},
+        { .stmt = (char *)"SELECT * FROM chibis"},
       };
     const struct sqlbox_parmset *res;
 
