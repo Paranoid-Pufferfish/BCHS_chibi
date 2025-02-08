@@ -114,7 +114,7 @@ int main(void) {
                 khtml_printf(&req, "CCID: %s", p->parsed.s);
             khtml_elem(&req, KELEM_BR);
              if ((p = r.fieldmap[KEY_CCINDEX]))
-                khtml_printf(&req, "CCINDEX: %ld", p->parsed.i);
+                khtml_printf(&req, "CCINDEX: %lld", p->parsed.i);
             break;
         default: khtml_printf(&req, "Probably Elsewhere");
             break;
