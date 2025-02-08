@@ -10,34 +10,6 @@
 #include <kcgihtml.h>
 #include <sqlbox.h>
 
-
-enum key {
-    KEY_CCID,
-    KEY_CCINDEX,
-    KEY__MAX
-};
-
-
-static const struct kvalid keys[KEY__MAX] = {
-    {kvalid_stringne, "CCID"},
-    {kvalid_uint, "CCINDEX"}
-};
-
-
-enum page {
-    PAGE_INDEX,
-    PAGE_ADD,
-    PAGE_GET,
-    PAGE__MAX
-};
-
-const char *const pages[PAGE__MAX] = {
-    "index",
-    "add",
-    "get"
-};
-
-
 int main(void) {
     struct kreq r;
     struct kpair *p;
@@ -64,18 +36,29 @@ int main(void) {
     cfg.stmts.stmtsz = 1;
     cfg.stmts.stmts = pstmts;
 
+    if (pledge("stdio rpath cpath "
+               "wpath flock proc fattr", NULL) == -1)
+        err(EXIT_FAILURE, "pledge");
+    if ((p2 = sqlbox_alloc(&cfg)) == NULL)
+        errx(EXIT_FAILURE, "sqlbox_alloc");
+    if (pledge("stdio proc", NULL) == -1)
+        err(EXIT_FAILURE, "pledge");
+    if (!(dbid = sqlbox_open(p2, 0)))
+        errx(EXIT_FAILURE, "sqlbox_open");
+    if (!(stmtid = sqlbox_prepare_bind(p2, dbid, 0, 0, 0, 0)))
+        errx(EXIT_FAILURE, "sqlbox_prepare_bind");
+    if ((res = sqlbox_step(p2, stmtid)) == NULL)
+        errx(EXIT_FAILURE, "sqlbox_step");
 
     enum khttp er = KHTTP_200;
     if (pledge("stdio proc", NULL) == -1)
         err(EXIT_FAILURE, "pledge");
-    if (khttp_parse(&r, keys, KEY__MAX, pages, PAGE__MAX, PAGE_INDEX) != KCGI_OK)
+    if (khttp_parse(&r, 0,0,0,0,0) != KCGI_OK)
         return 1;
     if (pledge("stdio", NULL) == -1)
         err(EXIT_FAILURE, "pledge");
     if (r.mime != KMIME_TEXT_HTML)
         er = KHTTP_404;
-    if (r.method != KMETHOD_GET)
-        er = KHTTP_405;
     khttp_head(&r, kresps[KRESP_STATUS],
                "%s", khttps[er]);
     khttp_head(&r, kresps[KRESP_CONTENT_TYPE],
@@ -83,61 +66,35 @@ int main(void) {
     khttp_body(&r);
     khtml_open(&req, &r, 0);
     kcgi_writer_disable(&r);
-    switch (r.page) {
-        case PAGE_INDEX: khtml_printf(&req, "You are in INDEX");
+    for (int i = 0; i < res->psz; ++i) {
+        switch (res->ps[i].type) {
+            case SQLBOX_PARM_BLOB:
+                khtml_printf(&req, "Blob: %zu bytes\n", res->ps[i].sz);
+            khtml_elem(&req, KELEM_BR);
             break;
-        case PAGE_ADD:
-            khtml_printf(&req, "You are in ADD");
+            case SQLBOX_PARM_FLOAT:
+                khtml_printf(&req, "Float: %f\n", res->ps[i].fparm);
+            khtml_elem(&req, KELEM_BR);
             break;
-        case PAGE_GET:
-            if (pledge("stdio rpath cpath "
-                       "wpath flock proc fattr", NULL) == -1)
-                err(EXIT_FAILURE, "pledge");
-            if ((p2 = sqlbox_alloc(&cfg)) == NULL)
-                errx(EXIT_FAILURE, "sqlbox_alloc");
-            if (pledge("stdio proc", NULL) == -1)
-                err(EXIT_FAILURE, "pledge");
-            if (!(dbid = sqlbox_open(p2, 0)))
-                errx(EXIT_FAILURE, "sqlbox_open");
-            if (!(stmtid = sqlbox_prepare_bind(p2, dbid, 0, 0, 0, 0)))
-                errx(EXIT_FAILURE, "sqlbox_prepare_bind");
-            if ((res = sqlbox_step(p2, stmtid)) == NULL)
-                errx(EXIT_FAILURE, "sqlbox_step");
-
-            khtml_printf(&req, "You are in GET");
-            for (int i = 0; i < res->psz; ++i) {
-                switch (res->ps[i].type) {
-                    case SQLBOX_PARM_BLOB:
-                        khtml_printf(&req, "Blob: %zu bytes\n", res->ps[i].sz);
-                        khtml_elem(&req, KELEM_BR);
-                        break;
-                    case SQLBOX_PARM_FLOAT:
-                        khtml_printf(&req, "Float: %f\n", res->ps[i].fparm);
-                        khtml_elem(&req, KELEM_BR);
-                        break;
-                    case SQLBOX_PARM_INT:
-                        khtml_printf(&req, "Blob: %lld\n", res->ps[i].iparm);
-                        khtml_elem(&req, KELEM_BR);
-                        break;
-                    case SQLBOX_PARM_NULL:
-                        khtml_printf(&req, "Null\n");
-                        khtml_elem(&req, KELEM_BR);
-                        break;
-                    case SQLBOX_PARM_STRING:
-                        khtml_printf(&req, "String: %s\n", res->ps[i].sparm);
-                        khtml_elem(&req, KELEM_BR);
-                        break;
-                }
-            }
+            case SQLBOX_PARM_INT:
+                khtml_printf(&req, "Blob: %lld\n", res->ps[i].iparm);
+            khtml_elem(&req, KELEM_BR);
             break;
-        default: khtml_printf(&req, "Probably Elsewhere");
+            case SQLBOX_PARM_NULL:
+                khtml_printf(&req, "Null\n");
+            khtml_elem(&req, KELEM_BR);
             break;
+            case SQLBOX_PARM_STRING:
+                khtml_printf(&req, "String: %s\n", res->ps[i].sparm);
+            khtml_elem(&req, KELEM_BR);
+            break;
+        }
     }
 
-    if (!sqlbox_finalise(p2, stmtid))
-        errx(EXIT_FAILURE, "sqlbox_finalise");
-    sqlbox_free(p2);
-    khtml_close(&req);
-    khttp_free(&r);
-    return 0;
-}
+        if (!sqlbox_finalise(p2, stmtid))
+            errx(EXIT_FAILURE, "sqlbox_finalise");
+        sqlbox_free(p2);
+        khtml_close(&req);
+        khttp_free(&r);
+        return 0;
+    }
