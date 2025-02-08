@@ -12,13 +12,15 @@
 
 
 enum key {
-    KEY_VAL,
+    KEY_CCID,
+    KEY_CCINDEX,
     KEY__MAX
 };
 
 
 static const struct kvalid keys[KEY__MAX] = {
-    {kvalid_int, "val"}, /* KEY_INTEGER */
+    {kvalid_stringne, "CCID"},
+    {kvalid_uint, "CCINDEX"}
 };
 
 
@@ -104,14 +106,15 @@ int main(void) {
         case PAGE_INDEX: khtml_printf(&req, "You are in INDEX");
             break;
         case PAGE_ADD:
-            if ((p = r.fieldmap[KEY_VAL]))
-                khtml_printf(&req, "You are in ADD and VAL = %lld", p->parsed.i);
-            else if (r.fieldnmap[KEY_VAL])
-                khtml_printf(&req, "You are in ADD and VAL is wrong");
-            else
-                khtml_printf(&req, "You are in ADD and VAL isnt provided");
+            khtml_printf(&req, "You are in ADD");
             break;
         case PAGE_GET: khtml_printf(&req, "You are in GET");
+            khtml_elem(&req, KELEM_BR);
+            if ((p = r.fieldmap[KEY_CCID]))
+                khtml_printf(&req, "CCID: %s", p->parsed.s);
+            khtml_elem(&req, KELEM_BR);
+             if ((p = r.fieldmap[KEY_CCINDEX]))
+                khtml_printf(&req, "CCINDEX: %ld", p->parsed.i);
             break;
         default: khtml_printf(&req, "Probably Elsewhere");
             break;
