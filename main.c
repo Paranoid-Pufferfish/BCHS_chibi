@@ -47,8 +47,7 @@ int main(void) {
         errx(EXIT_FAILURE, "sqlbox_open");
     if (!(stmtid = sqlbox_prepare_bind(p2, dbid, 0, 0, 0, 0)))
         errx(EXIT_FAILURE, "sqlbox_prepare_bind");
-    if ((res = sqlbox_step(p2, stmtid)) == NULL)
-        errx(EXIT_FAILURE, "sqlbox_step");
+
 
     enum khttp er = KHTTP_200;
     if (khttp_parse(&r, 0, 0, 0, 0, 0) != KCGI_OK)
@@ -62,7 +61,13 @@ int main(void) {
     khttp_body(&r);
     khtml_open(&req, &r, 0);
     kcgi_writer_disable(&r);
-    khtml_printf(&req,"Size: %lld",res->psz);
+
+    if ((res = sqlbox_step(p2, stmtid)) == NULL)
+        errx(EXIT_FAILURE, "sqlbox_step");
+    khtml_printf(&req, "Size: %zu", res->psz);
+    if ((res = sqlbox_step(p2, stmtid)) == NULL)
+        errx(EXIT_FAILURE, "sqlbox_step");
+    khtml_printf(&req, "Size: %zu", res->psz);
     // for (int i = 0; i < res->psz; ++i) {
     //     switch (res->ps[i].type) {
     //         case SQLBOX_PARM_BLOB:
