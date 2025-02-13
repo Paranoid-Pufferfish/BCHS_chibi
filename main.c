@@ -23,7 +23,7 @@ main(void)
     khttp_head(&r, kresps[KRESP_STATUS],
       "%s", khttps[KHTTP_200]);
     khttp_head(&r, kresps[KRESP_CONTENT_TYPE],
-      "%s", kmimetypes[r.mime]);
+      "%s", kmimetypes[KMIME_APP_JSON]);
     khttp_body(&r);
     kjson_open(&req, &r);
     kjson_obj_open(&req);
