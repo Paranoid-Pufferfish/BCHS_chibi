@@ -26,7 +26,7 @@ main(void)
       "%s", kmimetypes[KMIME_APP_JSON]);
     khttp_body(&r);
     kjson_open(&req, &r);
-    kjson_obj_open(&req);
+    kjson_objp_open(&req,"hello");
     kjson_putstringp(&req, "greeting", "hello, world");
     kjson_obj_close(&req);
     kjson_close(&req);
