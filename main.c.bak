@@ -1,0 +1,94 @@
+#include <sys/types.h> /* size_t, ssize_t */
+#include <stdarg.h> /* va_list */
+#include <stddef.h> /* NULL */
+#include <stdint.h> /* int64_t */
+#include <unistd.h> /* pledge() */
+#include <err.h> /* err(), warnx() */
+#include <stdlib.h> /* EXIT_FAILURE */
+#include <string.h> /* memset() */
+#include <kcgi.h>
+#include <kcgijson.h>
+#include <sqlbox.h>
+
+int main(void) {
+    struct kreq r;
+    struct kpair *p;
+    struct kjsonreq req;
+
+    size_t dbid, stmtid;
+    struct sqlbox *p2;
+    struct sqlbox_cfg cfg;
+    struct sqlbox_src srcs[] = {
+        {
+            .fname = (char *) "db/db.db",
+            .mode = SQLBOX_SRC_RWC
+        }
+    };
+    struct sqlbox_pstmt pstmts[] = {
+        {.stmt = (char *) "SELECT * FROM chibis"},
+    };
+    const struct sqlbox_parmset *res;
+
+    memset(&cfg, 0, sizeof(struct sqlbox_cfg));
+    cfg.msg.func_short = warnx;
+    cfg.srcs.srcsz = 1;
+    cfg.srcs.srcs = srcs;
+    cfg.stmts.stmtsz = 1;
+    cfg.stmts.stmts = pstmts;
+
+    if (pledge("stdio rpath cpath "
+               "wpath flock proc fattr", NULL) == -1)
+        err(EXIT_FAILURE, "pledge");
+    if ((p2 = sqlbox_alloc(&cfg)) == NULL)
+        errx(EXIT_FAILURE, "sqlbox_alloc");
+    if (pledge("stdio proc", NULL) == -1)
+        err(EXIT_FAILURE, "pledge");
+    if (!(dbid = sqlbox_open(p2, 0)))
+        errx(EXIT_FAILURE, "sqlbox_open");
+    if (!(stmtid = sqlbox_prepare_bind(p2, dbid, 0, 0, 0, 0)))
+        errx(EXIT_FAILURE, "sqlbox_prepare_bind");
+
+
+    if (khttp_parse(&r, 0, 0, 0, 0, 0) != KCGI_OK)
+        return 1;
+
+//    while((res = sqlbox_step(p2, stmtid)) != NULL && res->code == SQLBOX_CODE_OK && res->psz != 0){
+//    khtml_printf(&req, "CCID: %s", res->ps[0].sparm);
+//    khtml_elem(&req, KELEM_BR);
+//    khtml_printf(&req, "CCINDEX: %lld", res->ps[1].iparm);
+//    khtml_elem(&req, KELEM_BR);
+//    khtml_printf(&req, "HIT: %lld", res->ps[2].iparm);
+//    khtml_elem(&req, KELEM_BR);
+//    khtml_printf(&req, "PING: %s",(res->ps[3].iparm) ? "True" : "False");
+//    khtml_elem(&req, KELEM_BR);
+//    }
+//    if(res == NULL)
+//        errx(EXIT_FAILURE, "sqlbox_step");
+
+kjson_open(&req,&r);
+kcgi_writer_disable(&r);
+khttp_head(&r, kresps[KRESP_STATUS],
+                  "%s", khttps[KHTTP_200]);
+khttp_head(&r, kresps[KRESP_CONTENT_TYPE],
+                  "%s", kmimetypes[KMIME_APP_JSON]);
+khttp_body(&r);
+kjson_objp_open(&req, "anobj");
+kjson_putstringp(&req, "astring", "baz");
+kjson_putintp(&req, "anint", 12345);
+kjson_stringp_open(&req, "alongstring");
+kjson_string_puts(&req, "hello, ");
+kjson_string_puts(&req, "world.");
+kjson_string_close(&req); /* alongstring */
+kjson_arrayp_open(&req, "anarray");
+kjson_putint(&req, 1);
+kjson_putint(&req, 2);
+kjson_putdouble(&req, 3.0);
+kjson_array_close(&req); /* anarray */
+kjson_obj_close(&req); /* anobj */
+kjson_close(&req);
+    if (!sqlbox_finalise(p2, stmtid))
+        errx(EXIT_FAILURE, "sqlbox_finalise");
+    sqlbox_free(p2);
+    khttp_free(&r);
+    return 0;
+}
